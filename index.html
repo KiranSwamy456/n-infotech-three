@@ -58,10 +58,12 @@
        UTILITY
     ====================================== */
     .gradient-text {
-      background: var(--gradient-1);
+      background: linear-gradient(270deg, #0a84ff, #7c3aed, #06b6d4, #0a84ff);
+      background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      animation: gradientShift 5s ease infinite;
     }
     .gradient-text-cyan {
       background: var(--gradient-2);
@@ -89,6 +91,7 @@
       letter-spacing: 0.5px;
       text-transform: uppercase;
       margin-bottom: 16px;
+      animation: badgePulse 3s ease-in-out infinite;
     }
     .section-title {
       font-size: clamp(2rem,4vw,3rem);
@@ -193,8 +196,18 @@
       border-radius: 8px;
       transition: all 0.2s;
       text-decoration: none;
+      position: relative;
+    }
+    .nav-link-c::after {
+      content: '';
+      position: absolute;
+      bottom: 2px; left: 50%; right: 50%;
+      height: 1px;
+      background: var(--primary);
+      transition: left 0.2s ease, right 0.2s ease;
     }
     .nav-link-c:hover { color: #fff !important; background: rgba(255,255,255,0.07); }
+    .nav-link-c:hover::after { left: 14px; right: 14px; }
     .navbar-toggler-c {
       border: 1px solid rgba(255,255,255,0.2);
       background: transparent;
@@ -272,6 +285,9 @@
     .hero-trust { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 40px; animation: fadeInUp 0.8s ease 0.8s both; }
     .hero-trust-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
     /* Brain visual */
+    .hero-visual {
+      animation: heroVisualIn 1s cubic-bezier(0.16,1,0.3,1) 0.4s both;
+    }
     .brain-wrap { position: relative; max-width: 420px; margin: 0 auto; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
     .ring { position: absolute; border-radius: 50%; border: 2px solid transparent; }
     .ring-1 { width: 100%; height: 100%; border-color: rgba(10,132,255,0.3) rgba(10,132,255,0.3) transparent transparent; animation: spinCW 8s linear infinite; }
@@ -323,7 +339,8 @@
       border-top: 1px solid rgba(255,255,255,0.05);
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    .stat-item { text-align: center; padding: 20px; }
+    .stat-item { text-align: center; padding: 20px; transition: transform 0.3s ease; }
+    .stat-item:hover { transform: translateY(-4px); }
     .stat-number {
       font-size: clamp(2.2rem,4vw,3.2rem);
       font-weight: 900;
@@ -331,7 +348,6 @@
       line-height: 1; margin-bottom: 8px;
     }
     .stat-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-    .stat-sep { border: none; height: 1px; background: rgba(255,255,255,0.07); }
 
     /* ======================================
        ABOUT
@@ -390,8 +406,19 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--gradient-1); opacity: 0; transition: opacity 0.3s;
     }
+    /* Shimmer sweep */
+    .service-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+      background-size: 200% 100%;
+      background-position: 200% center;
+      transition: background-position 0.6s ease;
+      pointer-events: none;
+    }
     .service-card:hover { transform: translateY(-8px); border-color: rgba(10,132,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(10,132,255,0.1); }
     .service-card:hover::before { opacity: 1; }
+    .service-card:hover::after { background-position: -200% center; }
     .service-icon { width: 62px; height: 62px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 22px; }
     .service-card h4 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
     .service-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 18px; }
@@ -399,23 +426,121 @@
     .learn-link { font-size: 13px; font-weight: 600; cursor: pointer; transition: gap 0.2s; display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; text-decoration: none; }
 
     /* ======================================
-       PROCESS
+       PROCESS — ANIMATED TIMELINE
     ====================================== */
     #process { padding: 100px 0; background: var(--dark); }
-    .process-card {
+
+    /* Desktop zigzag timeline */
+    .process-timeline {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Vertical track line */
+    .ptl-track {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 40px; bottom: 40px;
+      width: 2px;
+      background: rgba(255,255,255,0.06);
+      overflow: hidden;
+      border-radius: 2px;
+      z-index: 0;
+    }
+    .ptl-fill {
+      width: 100%;
+      background: linear-gradient(to bottom, #0a84ff, #7c3aed, #06b6d4, #f59e0b, #10b981, #ec4899);
+      transition: height 0.12s ease-out;
+      border-radius: 2px;
+    }
+    /* Row */
+    .ptl-row {
+      display: grid;
+      grid-template-columns: 1fr 80px 1fr;
+      align-items: center;
+      min-height: 200px;
+      padding: 24px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .ptl-col { padding: 0 28px; }
+    .ptl-node-col {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      position: relative; z-index: 2;
+    }
+    /* Center node circle */
+    .ptl-node {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      position: relative;
+      transition: all 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .ptl-node.visible {
+      box-shadow: var(--node-glow);
+    }
+    /* Pulse ring */
+    .ptl-pulse {
+      position: absolute; inset: -8px;
+      border-radius: 50%;
+      border: 2px solid;
+      opacity: 0;
+      animation: nodeRingPulse 2.5s ease-out infinite;
+    }
+    /* Step badge */
+    .ptl-badge {
+      font-size: 11px; font-weight: 800; color: #fff;
+      padding: 3px 11px; border-radius: 50px;
+      letter-spacing: 0.5px;
+      transition: all 0.5s ease;
+    }
+    /* Step card */
+    .ptl-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 20px;
-      padding: 28px 24px;
-      height: 100%;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      padding: 28px 26px;
+      position: relative; overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+      will-change: transform, opacity;
     }
-    .process-card:hover { transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-    .step-icon { width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .step-num-bg { position: absolute; top: 16px; right: 16px; font-size: 4rem; font-weight: 900; font-family: 'Space Grotesk', sans-serif; opacity: 0.06; line-height: 1; }
-    .step-point { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 50px; margin: 2px; }
+    .ptl-card:hover {
+      transform: translateY(-6px);
+    }
+    /* Animated top bar */
+    .ptl-bar {
+      position: absolute; top: 0; left: 0;
+      height: 3px; border-radius: 3px 3px 0 0;
+      transition: width 0.8s ease 0.3s;
+    }
+    /* Card animate wrapper */
+    .ptl-anim {
+      will-change: transform, opacity;
+      transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .ptl-anim.from-left  { opacity: 0; transform: translateX(-50px); }
+    .ptl-anim.from-right { opacity: 0; transform: translateX(50px);  }
+    .ptl-anim.revealed   { opacity: 1; transform: translateX(0);      }
+
+    /* Mobile layout */
+    .process-mobile { display: none; }
+
+    @media(max-width:767px) {
+      .process-timeline { display: none; }
+      .process-mobile    { display: block; }
+      .ptl-card { padding: 20px 16px; }
+      .pm-item { will-change: transform, opacity; transition: all 0.6s ease; }
+      .pm-item.from-below  { opacity: 0; transform: translateY(30px); }
+      .pm-item.revealed    { opacity: 1; transform: translateY(0); }
+    }
+    @media(min-width:768px) and (max-width:1100px) {
+      .ptl-row { grid-template-columns: 1fr 60px 1fr; }
+      .ptl-col { padding: 0 14px; }
+      .ptl-node { width: 52px; height: 52px; font-size: 18px; }
+    }
 
     /* ======================================
        TECH STACK
@@ -452,8 +577,21 @@
       border: 1px solid var(--card-border);
       border-radius: 20px; overflow: hidden;
       transition: all 0.35s; height: 100%;
+      position: relative;
+    }
+    /* Portfolio shimmer */
+    .portfolio-card::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%);
+      background-size: 200% 100%;
+      background-position: 200% center;
+      transition: background-position 0.7s ease;
+      pointer-events: none;
+      border-radius: 20px;
     }
     .portfolio-card:hover { transform: translateY(-6px); border-color: rgba(10,132,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .portfolio-card:hover::after { background-position: -200% center; }
     .portfolio-img {
       aspect-ratio: 16/9; position: relative;
       display: flex; align-items: center; justify-content: center;
@@ -498,7 +636,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 32px; font-weight: 900; color: #fff;
       position: relative;
+      transition: all 0.4s ease;
     }
+    .team-card:hover .team-avatar { box-shadow: 0 0 30px rgba(124,58,237,0.4); transform: scale(1.05); }
     .team-avatar::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; z-index: -1; opacity: 0.5; }
     .team-name { font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
     .team-role { font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
@@ -523,8 +663,16 @@
       border: 1px solid var(--card-border);
       border-radius: 20px; padding: 30px;
       height: 100%; transition: all 0.3s;
+      position: relative;
+    }
+    .testi-card::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(10,132,255,0.04), transparent);
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
     }
     .testi-card:hover { border-color: rgba(10,132,255,0.3); transform: translateY(-4px); }
+    .testi-card:hover::before { opacity: 1; }
     .testi-quote { font-size: 38px; color: var(--primary); opacity: 0.4; line-height: 1; font-family: Georgia, serif; margin-bottom: 10px; }
     .testi-text { font-size: 14px; color: var(--text-light); line-height: 1.8; font-style: italic; margin-bottom: 22px; }
     .testi-author { display: flex; align-items: center; gap: 12px; }
@@ -549,7 +697,7 @@
     }
     .price-card.featured { border-color: rgba(10,132,255,0.5); background: linear-gradient(135deg, rgba(10,132,255,0.08), rgba(124,58,237,0.05)); }
     .price-card.featured::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gradient-1); }
-    .price-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+    .price-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); border-color: rgba(10,132,255,0.4); }
     .price-badge { position: absolute; top: -1px; right: 26px; background: var(--gradient-1); color: #fff; font-size: 11px; font-weight: 700; padding: 6px 14px 8px; border-radius: 0 0 12px 12px; text-transform: uppercase; letter-spacing: 0.5px; }
     .price-tier { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
     .price-amount { font-size: 3rem; font-weight: 900; font-family: 'Space Grotesk', sans-serif; line-height: 1; color: #fff; }
@@ -577,6 +725,7 @@
       border: 1px solid rgba(10,132,255,0.2);
       border-radius: 32px; padding: 70px 50px;
       text-align: center; position: relative; overflow: hidden;
+      animation: ctaGlow 4s ease-in-out infinite;
     }
     .cta-box::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--gradient-1); opacity: 0.5; }
     .cta-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 28px; margin-top: 40px; }
@@ -588,7 +737,8 @@
     #contact { padding: 100px 0; background: var(--dark-2); }
     .contact-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 44px 38px; height: 100%; }
     .contact-info-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 26px; }
-    .contact-icon { width: 46px; height: 46px; border-radius: 13px; background: rgba(10,132,255,0.1); border: 1px solid rgba(10,132,255,0.2); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 17px; flex-shrink: 0; }
+    .contact-icon { width: 46px; height: 46px; border-radius: 13px; background: rgba(10,132,255,0.1); border: 1px solid rgba(10,132,255,0.2); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 17px; flex-shrink: 0; transition: all 0.3s ease; }
+    .contact-info-row:hover .contact-icon { transform: scale(1.15) rotate(-5deg); background: rgba(10,132,255,0.2); }
     .c-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
     .c-val { font-size: 14px; font-weight: 600; color: #fff; }
     .form-ctrl {
@@ -622,8 +772,8 @@
     .footer-brand span { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .footer-desc { font-size: 14px; color: var(--text-muted); line-height: 1.8; margin-top: 12px; max-width: 280px; }
     .footer-h { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 16px; }
-    .footer-lnk { display: block; font-size: 13px; color: var(--text-muted); text-decoration: none; padding: 4px 0; transition: color 0.2s; }
-    .footer-lnk:hover { color: var(--primary); }
+    .footer-lnk { display: block; font-size: 13px; color: var(--text-muted); text-decoration: none; padding: 4px 0; transition: color 0.2s, padding-left 0.2s; }
+    .footer-lnk:hover { color: var(--primary); padding-left: 8px; }
     .footer-hr { border: none; height: 1px; background: rgba(255,255,255,0.06); margin: 36px 0 22px; }
     .footer-bottom { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; gap: 10px; }
     .soc-btn { width: 37px; height: 37px; border-radius: 9px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; text-decoration: none; transition: all 0.2s; }
@@ -649,17 +799,241 @@
     #backTop:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(10,132,255,0.5); }
 
     /* ======================================
-       ANIMATIONS
+       LIVE BLOOMBERG TICKER
     ====================================== */
-    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeInRight { from{opacity:0;transform:translateX(40px)} to{opacity:1;transform:translateX(0)} }
-    @keyframes floatAnim { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
-    @keyframes floatAnim2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    @keyframes spinCW { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-    @keyframes spinCCW { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .live-ticker-band {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      height: 42px;
+      background: rgba(8,12,24,0.92);
+      border-top: 1px solid rgba(10,132,255,0.18);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .ticker-label-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 16px;
+      font-size: 10px; font-weight: 900; letter-spacing: 2px;
+      color: #10b981; text-transform: uppercase; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      height: 100%;
+      background: rgba(16,185,129,0.08);
+      flex-shrink: 0;
+      font-family: 'Space Grotesk', monospace;
+    }
+    .ticker-live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #10b981; box-shadow: 0 0 8px #10b981;
+      animation: tickerPulse 1.2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .ticker-track-wrap {
+      flex: 1; overflow: hidden; height: 100%;
+      display: flex; align-items: center;
+      mask-image: linear-gradient(90deg, transparent 0%, black 3%, black 97%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 3%, black 97%, transparent 100%);
+    }
+    .ticker-track {
+      display: flex; align-items: center;
+      white-space: nowrap;
+      animation: tickerScroll 50s linear infinite;
+      will-change: transform;
+    }
+    .ticker-track:hover { animation-play-state: paused; cursor: default; }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 0 4px;
+      font-family: 'Space Grotesk', monospace;
+    }
+    .ticker-item-label {
+      font-size: 10px; font-weight: 800;
+      color: rgba(148,163,184,0.7);
+      letter-spacing: 0.8px; text-transform: uppercase;
+    }
+    .ticker-item-arrow { font-size: 10px; font-weight: 700; transition: color 0.4s; }
+    .ticker-item-value {
+      font-size: 13px; font-weight: 800;
+      font-family: 'Space Grotesk', monospace;
+      letter-spacing: 0.3px;
+      transition: color 0.4s;
+      min-width: 40px;
+    }
+    .ticker-sep {
+      color: rgba(255,255,255,0.1);
+      font-size: 16px; padding: 0 12px; font-weight: 300;
+    }
+
+    /* ======================================
+       KEYFRAME ANIMATIONS
+    ====================================== */
+    @keyframes fadeInUp    { from{opacity:0;transform:translateY(30px)}  to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInDown  { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes floatAnim   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-14px)} }
+    @keyframes floatAnim2  { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-10px)} }
+    @keyframes spinCW      { from{transform:rotate(0deg)}    to{transform:rotate(360deg)}  }
+    @keyframes spinCCW     { from{transform:rotate(0deg)}    to{transform:rotate(-360deg)} }
+    @keyframes pulse       { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+    @keyframes blink       { 0%,100%{opacity:1} 50%{opacity:0} }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+    @keyframes badgePulse  { 0%,100%{box-shadow:0 0 0 0 rgba(10,132,255,0)} 50%{box-shadow:0 0 0 6px rgba(10,132,255,0.08)} }
+    @keyframes ctaGlow     { 0%,100%{box-shadow:0 0 60px rgba(10,132,255,0.08)} 50%{box-shadow:0 0 80px rgba(124,58,237,0.12)} }
+    @keyframes heroVisualIn { from{opacity:0;transform:scale(0.92) translateY(20px);filter:blur(10px)} to{opacity:1;transform:scale(1) translateY(0);filter:blur(0)} }
+    @keyframes nodeRingPulse { 0%{opacity:0.7;transform:scale(1)} 100%{opacity:0;transform:scale(1.6)} }
+    @keyframes nodeSpring  { 0%{transform:scale(0.3)} 60%{transform:scale(1.15)} 80%{transform:scale(0.95)} 100%{transform:scale(1)} }
+    @keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @keyframes tickerPulse  { 0%,100%{opacity:1;box-shadow:0 0 8px #10b981} 50%{opacity:0.4;box-shadow:0 0 3px #10b981} }
+
+    /* ======================================
+       CHATBOT WIDGET
+    ====================================== */
+    @keyframes chatDot      { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+    @keyframes chatPulseRing{ 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(1.7);opacity:0} }
+    @keyframes chatSlideIn  { from{opacity:0;transform:translateY(20px) scale(0.95)} to{opacity:1;transform:translateY(0) scale(1)} }
+
+    #chatWindow {
+      position:fixed; bottom:90px; right:24px; z-index:9999;
+      width:360px; max-height:72vh;
+      background:#0d1526;
+      border:1px solid rgba(10,132,255,0.25);
+      border-radius:20px;
+      display:flex; flex-direction:column;
+      box-shadow:0 24px 80px rgba(0,0,0,0.7),0 0 40px rgba(10,132,255,0.12);
+      overflow:hidden;
+      animation:chatSlideIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    #chatWindow.hidden { display:none; }
+    .chat-header {
+      padding:14px 18px;
+      background:linear-gradient(135deg,rgba(10,132,255,0.2),rgba(124,58,237,0.15));
+      border-bottom:1px solid rgba(255,255,255,0.07);
+      display:flex; align-items:center; gap:10px; flex-shrink:0;
+    }
+    .chat-avatar {
+      width:38px; height:38px; border-radius:50%;
+      background:linear-gradient(135deg,#0a84ff,#7c3aed);
+      display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+      box-shadow:0 0 16px rgba(10,132,255,0.4);
+    }
+    .chat-messages {
+      flex:1; overflow-y:auto; padding:16px 14px 4px;
+      scrollbar-width:thin; scrollbar-color:#1e293b transparent;
+    }
+    .chat-msg-bot  { display:flex; gap:8px; align-items:flex-start; margin-bottom:14px; }
+    .chat-msg-user { display:flex; justify-content:flex-end; margin-bottom:14px; }
+    .chat-bubble-bot {
+      max-width:82%; background:rgba(10,132,255,0.1);
+      border:1px solid rgba(10,132,255,0.2);
+      border-radius:4px 14px 14px 14px;
+      padding:10px 13px; font-size:13px; color:#e2e8f0; line-height:1.65; white-space:pre-line;
+    }
+    .chat-bubble-bot strong { color:#fff; }
+    .chat-bubble-user {
+      max-width:78%;
+      background:linear-gradient(135deg,rgba(10,132,255,0.3),rgba(124,58,237,0.3));
+      border:1px solid rgba(10,132,255,0.3);
+      border-radius:14px 4px 14px 14px;
+      padding:10px 13px; font-size:13px; color:#fff; line-height:1.65;
+    }
+    .chat-bot-mini {
+      width:30px; height:30px; border-radius:50%;
+      background:linear-gradient(135deg,#0a84ff,#7c3aed);
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; flex-shrink:0;
+      box-shadow:0 0 12px rgba(10,132,255,0.35);
+    }
+    .typing-dots { display:flex; gap:4px; align-items:center; }
+    .typing-dot {
+      width:6px; height:6px; border-radius:50%; background:#0a84ff;
+    }
+    .typing-dot:nth-child(1){ animation:chatDot 1.2s ease-in-out 0s infinite; }
+    .typing-dot:nth-child(2){ animation:chatDot 1.2s ease-in-out 0.2s infinite; }
+    .typing-dot:nth-child(3){ animation:chatDot 1.2s ease-in-out 0.4s infinite; }
+    .chat-quick-replies { padding:6px 14px 2px; display:flex; flex-wrap:wrap; gap:6px; }
+    .chat-chip {
+      padding:5px 11px; border-radius:20px;
+      border:1px solid rgba(10,132,255,0.3);
+      background:rgba(10,132,255,0.08); color:#94a3b8;
+      font-size:11px; font-weight:600; cursor:pointer;
+      transition:all 0.2s; font-family:Inter,sans-serif;
+    }
+    .chat-chip:hover { border-color:#0a84ff; color:#0a84ff; background:rgba(10,132,255,0.15); }
+    .chat-input-row {
+      padding:10px 14px 14px;
+      border-top:1px solid rgba(255,255,255,0.06);
+      display:flex; gap:8px; flex-shrink:0;
+    }
+    #chatInput {
+      flex:1; background:rgba(255,255,255,0.05);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:12px; padding:10px 14px;
+      color:#fff; font-size:13px; outline:none;
+      font-family:Inter,sans-serif; transition:border-color 0.2s;
+    }
+    #chatInput:focus { border-color:rgba(10,132,255,0.5); }
+    #chatSend {
+      width:40px; height:40px; border-radius:12px; border:none;
+      background:linear-gradient(135deg,#0a84ff,#7c3aed);
+      color:#fff; cursor:pointer; display:flex; align-items:center;
+      justify-content:center; flex-shrink:0; transition:transform 0.2s, box-shadow 0.2s;
+    }
+    #chatSend:hover { transform:scale(1.08); box-shadow:0 6px 20px rgba(10,132,255,0.4); }
+    .chat-powered {
+      text-align:center; padding:4px 0 10px;
+      font-size:10px; color:rgba(148,163,184,0.4); font-weight:600; letter-spacing:0.5px;
+    }
+    #chatFab {
+      position:fixed; bottom:24px; right:24px; z-index:9999;
+    }
+    .chat-fab-btn {
+      width:56px; height:56px; border-radius:50%; border:none;
+      background:linear-gradient(135deg,#0a84ff,#7c3aed);
+      color:#fff; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 8px 30px rgba(10,132,255,0.5);
+      transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      position:relative; font-size:22px;
+    }
+    .chat-fab-btn:hover { transform:scale(1.1); }
+    .chat-fab-btn.open {
+      background:rgba(30,41,59,0.95);
+      box-shadow:0 8px 30px rgba(0,0,0,0.5);
+      font-size:20px;
+    }
+    .chat-pulse-ring {
+      position:absolute; inset:0; border-radius:50%;
+      border:2px solid rgba(10,132,255,0.4);
+      animation:chatPulseRing 2s ease-out infinite;
+      pointer-events:none;
+    }
+    .chat-pulse-ring-2 {
+      position:absolute; inset:0; border-radius:50%;
+      border:2px solid rgba(10,132,255,0.25);
+      animation:chatPulseRing 2s ease-out 0.5s infinite;
+      pointer-events:none;
+    }
+    .chat-badge {
+      position:absolute; top:-4px; right:-4px;
+      width:20px; height:20px; border-radius:50%;
+      background:#ef4444; border:2px solid #0a0e1a;
+      display:flex; align-items:center; justify-content:center;
+      font-size:10px; font-weight:900; color:#fff;
+    }
+    .chat-tooltip {
+      position:absolute; bottom:calc(100% + 10px); right:0;
+      background:rgba(15,23,42,0.95);
+      border:1px solid rgba(10,132,255,0.25);
+      border-radius:10px; padding:8px 14px;
+      white-space:nowrap; font-size:12px; font-weight:700; color:#fff;
+      backdrop-filter:blur(8px); pointer-events:none;
+      box-shadow:0 8px 24px rgba(0,0,0,0.4);
+      opacity:0; transition:opacity 0.25s;
+    }
+    #chatFab:hover .chat-tooltip { opacity:1; }
+
     .typing-cursor { display: inline-block; width: 3px; height: 0.88em; background: var(--primary); margin-left: 3px; vertical-align: middle; animation: blink 1s step-end infinite; }
     .float1 { animation: floatAnim 4s ease-in-out infinite; }
     .float2 { animation: floatAnim 5s ease-in-out infinite 1.5s; }
@@ -678,6 +1052,7 @@
       .section-title { font-size: 2rem; }
       .cta-box { padding: 40px 18px; }
       .footer-bottom { flex-direction: column; text-align: center; }
+      .ptl-card { padding: 18px 14px; }
     }
   </style>
 </head>
@@ -706,7 +1081,6 @@
         </button>
       </div>
     </div>
-    <!-- Mobile menu -->
     <div class="mobile-menu" id="mobileMenu">
       <div style="padding:14px 0 6px;">
         <a href="#home" class="nav-link-c d-block mb-1">Home</a>
@@ -729,7 +1103,6 @@
   <div class="hero-bg"></div>
   <div class="hero-grid"></div>
   <canvas id="particles-canvas"></canvas>
-  <!-- Blobs -->
   <div class="blob" style="background:#0a84ff;width:400px;height:400px;top:10%;left:-5%;animation-delay:0s;"></div>
   <div class="blob" style="background:#7c3aed;width:300px;height:300px;bottom:15%;right:-5%;animation-delay:3s;"></div>
   <div class="blob" style="background:#06b6d4;width:250px;height:250px;top:60%;left:40%;animation-delay:6s;"></div>
@@ -749,12 +1122,8 @@
           From intelligent automation to predictive analytics — we build the future, today.
         </p>
         <div class="hero-btns d-flex flex-wrap gap-3">
-          <a href="#services" class="btn-primary-custom">
-            <i class="fas fa-brain"></i> Explore Services
-          </a>
-          <a href="#portfolio" class="btn-outline-custom">
-            <i class="fas fa-play-circle"></i> View Our Work
-          </a>
+          <a href="#services" class="btn-primary-custom"><i class="fas fa-brain"></i> Explore Services</a>
+          <a href="#portfolio" class="btn-outline-custom"><i class="fas fa-play-circle"></i> View Our Work</a>
         </div>
         <div class="hero-trust">
           <div class="hero-trust-item"><i class="fas fa-award" style="color:var(--primary)"></i> ISO Certified</div>
@@ -762,15 +1131,13 @@
           <div class="hero-trust-item"><i class="fas fa-star" style="color:var(--primary)"></i> 5-Star Rated</div>
         </div>
       </div>
-
       <div class="col-lg-6 d-flex justify-content-center">
-        <div style="position:relative;width:100%;max-width:440px;">
+        <div class="hero-visual" style="position:relative;width:100%;max-width:440px;">
           <div class="brain-wrap">
             <div class="ring ring-1"></div>
             <div class="ring ring-2"></div>
             <div class="ring ring-3"></div>
             <div class="brain-center">🧠</div>
-            <!-- Orbit nodes -->
             <div class="orbit-node" style="top:2%;left:44%;">
               <div class="orbit-icon" style="background:rgba(10,132,255,0.15);border:2px solid #0a84ff;box-shadow:0 0 16px #0a84ff50;">⚡</div>
               <div class="orbit-label">NLP</div>
@@ -788,7 +1155,6 @@
               <div class="orbit-label">AutoML</div>
             </div>
           </div>
-          <!-- Floating cards -->
           <div class="stat-float float1" style="top:0;right:-10px;">
             <div class="stat-float-label">Model Accuracy</div>
             <div class="stat-float-value" style="color:#10b981;">99.4%</div>
@@ -801,8 +1167,15 @@
       </div>
     </div>
   </div>
-  <!-- Scroll indicator -->
-  <div class="d-none d-md-flex flex-column align-items-center" style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);gap:8px;z-index:2;">
+  <!-- Live Bloomberg Ticker -->
+  <div class="live-ticker-band">
+    <div class="ticker-label-pill"><span class="ticker-live-dot"></span>LIVE</div>
+    <div class="ticker-track-wrap">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+  </div>
+
+  <div class="d-none d-md-flex flex-column align-items-center" style="position:absolute;bottom:58px;left:50%;transform:translateX(-50%);gap:8px;z-index:2;">
     <span style="font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:1px;text-transform:uppercase;">Scroll</span>
     <div style="width:24px;height:38px;border:2px solid rgba(255,255,255,0.15);border-radius:12px;display:flex;justify-content:center;padding-top:6px;">
       <div style="width:4px;height:8px;border-radius:2px;background:var(--primary);animation:floatAnim2 1.5s ease-in-out infinite;"></div>
@@ -843,7 +1216,7 @@
   <div class="container">
     <div class="row align-items-center g-5">
       <div class="col-lg-6" data-aos="fade-right">
-        <div class="about-img-card">
+        <div class="about-img-card" style="position:relative;">
           <div class="about-img-bg"></div>
           <div style="position:relative;z-index:2;text-align:center;padding:30px;">
             <div style="font-size:4.5rem;margin-bottom:14px;filter:drop-shadow(0 0 30px rgba(10,132,255,0.4));">🤖</div>
@@ -865,33 +1238,25 @@
             </div>
           </div>
         </div>
-        <!-- Floating badges -->
         <div class="about-float float1" style="top:-20px;right:-20px;">
           <div class="about-float-icon" style="background:rgba(10,132,255,0.15);color:#0a84ff;"><i class="fas fa-award" style="font-size:19px;"></i></div>
           <div><div style="font-size:13px;font-weight:800;color:#fff;">Award Winning</div><div style="font-size:11px;color:var(--text-muted);">Best AI Company 2024</div></div>
         </div>
         <div class="about-float float2" style="bottom:-20px;left:-20px;">
-          <div class="about-float-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-check-circle" style="font-size:19px;"></i></div>
-          <div><div style="font-size:13px;font-weight:800;color:#fff;">ISO 27001</div><div style="font-size:11px;color:var(--text-muted);">Certified & Compliant</div></div>
+          <div class="about-float-icon" style="background:rgba(16,185,129,0.15);color:#10b981;"><i class="fas fa-users" style="font-size:19px;"></i></div>
+          <div><div style="font-size:13px;font-weight:800;color:#fff;">50+ AI Experts</div><div style="font-size:11px;color:var(--text-muted);">PhD & Industry Leaders</div></div>
         </div>
       </div>
-
       <div class="col-lg-6" data-aos="fade-left">
         <div class="section-badge"><i class="fas fa-info-circle"></i> About N-Infotech</div>
-        <h2 class="section-title">Pioneering the Future with <span class="gradient-text">Intelligent AI</span></h2>
-        <p class="section-subtitle mb-3">Founded with a vision to democratize AI, N-Infotech is a cutting-edge technology company delivering world-class artificial intelligence and machine learning solutions. We transform complex data into actionable insights that drive business growth.</p>
-        <p style="font-size:14px;color:var(--text-muted);line-height:1.8;margin-bottom:26px;">Our team of 50+ AI/ML experts, data scientists, and engineers combine deep domain expertise with the latest research to build solutions that truly matter. From Fortune 500 companies to innovative startups — we deliver results.</p>
-        <div class="row g-2 mb-4">
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">Industry-leading AI & ML research team</span></div></div>
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">End-to-end solution delivery</span></div></div>
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">Real-time monitoring & optimization</span></div></div>
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">Scalable enterprise architecture</span></div></div>
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">24/7 support and maintenance</span></div></div>
-          <div class="col-12 col-sm-6"><div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><span style="font-size:14px;color:var(--text-light);">GDPR & HIPAA compliant</span></div></div>
-        </div>
-        <div class="d-flex gap-3 flex-wrap">
-          <a href="#contact" class="btn-primary-custom"><i class="fas fa-handshake"></i> Work With Us</a>
-          <a href="#portfolio" class="btn-outline-custom"><i class="fas fa-folder-open"></i> Our Portfolio</a>
+        <h2 class="section-title">Transforming Business with <span class="gradient-text">Intelligent AI</span></h2>
+        <p style="font-size:15px;color:var(--text-muted);line-height:1.85;margin-bottom:28px;">Founded in 2014, N-Infotech has been at the forefront of AI and machine learning innovation. We combine deep research expertise with practical engineering to deliver AI solutions that create real business value.</p>
+        <div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><div><strong style="color:#fff;font-size:14px;">Research-Driven Approach</strong><p style="font-size:13px;color:var(--text-muted);margin:3px 0 0;">Our team publishes in top AI conferences and applies cutting-edge research to production systems.</p></div></div>
+        <div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><div><strong style="color:#fff;font-size:14px;">End-to-End Delivery</strong><p style="font-size:13px;color:var(--text-muted);margin:3px 0 0;">From data strategy to model deployment, we handle every phase of your AI transformation journey.</p></div></div>
+        <div class="feature-check"><div class="check-icon"><i class="fas fa-check" style="font-size:9px;color:var(--primary);"></i></div><div><strong style="color:#fff;font-size:14px;">Proven ROI</strong><p style="font-size:13px;color:var(--text-muted);margin:3px 0 0;">Average 340% ROI across client projects within the first year of AI deployment.</p></div></div>
+        <div class="d-flex gap-3 mt-4 flex-wrap">
+          <a href="#services" class="btn-primary-custom" style="padding:12px 26px;font-size:14px;"><i class="fas fa-arrow-right"></i> Explore Services</a>
+          <a href="#contact" class="btn-outline-custom" style="padding:12px 26px;font-size:14px;"><i class="fas fa-calendar"></i> Schedule a Call</a>
         </div>
       </div>
     </div>
@@ -907,7 +1272,6 @@
       <p class="section-subtitle mx-auto">From raw data to production-ready AI systems — we cover the full spectrum of artificial intelligence and machine learning services.</p>
     </div>
     <div class="row g-4">
-      <!-- Cards -->
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
         <div class="service-card">
           <div class="service-icon" style="background:rgba(10,132,255,0.15);">🤖</div>
@@ -1011,7 +1375,7 @@
   </div>
 </section>
 
-<!-- ==================== PROCESS ==================== -->
+<!-- ==================== PROCESS — ANIMATED TIMELINE ==================== -->
 <section id="process">
   <div class="container">
     <div class="text-center mb-5" data-aos="fade-up">
@@ -1019,92 +1383,253 @@
       <h2 class="section-title">How We <span class="gradient-text-cyan">Deliver Excellence</span></h2>
       <p class="section-subtitle mx-auto">A battle-tested 6-step methodology that takes your AI project from ideation to production with speed, accuracy, and transparency.</p>
     </div>
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#0a84ff;">01</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);color:#0a84ff;"><i class="fas fa-search"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#0a84ff;text-transform:uppercase;letter-spacing:1px;">Step 01</span>
+
+    <!-- === DESKTOP ZIGZAG TIMELINE === -->
+    <div class="process-timeline" id="processTimeline">
+      <!-- Scroll-driven fill line -->
+      <div class="ptl-track"><div class="ptl-fill" id="ptlFill"></div></div>
+
+      <!-- Step 01 — LEFT card -->
+      <div class="ptl-row" data-step="0">
+        <div class="ptl-col">
+          <div class="ptl-anim from-left">
+            <div class="ptl-card" data-color="#0a84ff" data-border="rgba(10,132,255,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#0a84ff,rgba(10,132,255,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(10,132,255,0.15);border:1px solid rgba(10,132,255,0.3);display:flex;align-items:center;justify-content:center;color:#0a84ff;font-size:18px;flex-shrink:0;"><i class="fas fa-search"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#0a84ff;text-transform:uppercase;letter-spacing:1.5px;">Step 01</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Discovery & Requirements</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">We deep-dive into your business goals, data assets, and technical landscape to define the perfect AI strategy and project roadmap.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Business analysis</span>
+                <span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Data audit</span>
+                <span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Feasibility study</span>
+                <span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Goal alignment</span>
+              </div>
+            </div>
           </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Discovery & Requirements</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">We deep-dive into your business goals, data assets, and technical landscape to define the perfect AI strategy and project roadmap.</p>
-          <span class="step-point" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Business analysis</span>
-          <span class="step-point" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Data audit</span>
-          <span class="step-point" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Feasibility study</span>
+        </div>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#0a84ff" style="--node-glow:0 0 30px rgba(10,132,255,0.4),0 0 0 8px rgba(10,132,255,0.1);">🔍<div class="ptl-pulse" style="border-color:#0a84ff;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#0a84ff,rgba(10,132,255,0.7));">01</div>
+        </div>
+        <div class="ptl-col"></div>
+      </div>
+
+      <!-- Step 02 — RIGHT card -->
+      <div class="ptl-row" data-step="1">
+        <div class="ptl-col"></div>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#7c3aed" style="--node-glow:0 0 30px rgba(124,58,237,0.4),0 0 0 8px rgba(124,58,237,0.1);">🗄️<div class="ptl-pulse" style="border-color:#7c3aed;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#7c3aed,rgba(124,58,237,0.7));">02</div>
+        </div>
+        <div class="ptl-col">
+          <div class="ptl-anim from-right">
+            <div class="ptl-card" data-color="#7c3aed" data-border="rgba(124,58,237,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#7c3aed,rgba(124,58,237,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:18px;flex-shrink:0;"><i class="fas fa-database"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:1.5px;">Step 02</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Data Engineering</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">Our data engineers collect, clean, preprocess, and engineer features from your raw data to build robust training pipelines.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Data collection</span>
+                <span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">ETL pipelines</span>
+                <span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Feature engineering</span>
+                <span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Data validation</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#7c3aed;">02</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:#7c3aed;"><i class="fas fa-database"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;">Step 02</span>
+
+      <!-- Step 03 — LEFT card -->
+      <div class="ptl-row" data-step="2">
+        <div class="ptl-col">
+          <div class="ptl-anim from-left">
+            <div class="ptl-card" data-color="#06b6d4" data-border="rgba(6,182,212,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#06b6d4,rgba(6,182,212,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);display:flex;align-items:center;justify-content:center;color:#06b6d4;font-size:18px;flex-shrink:0;"><i class="fas fa-brain"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#06b6d4;text-transform:uppercase;letter-spacing:1.5px;">Step 03</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Model Development</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">We research, design, and train cutting-edge ML/DL models with rigorous experimentation and hyperparameter optimization.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Algorithm selection</span>
+                <span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Model training</span>
+                <span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Hyperparameter tuning</span>
+                <span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Cross-validation</span>
+              </div>
+            </div>
           </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Data Engineering</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">Our data engineers collect, clean, preprocess, and engineer features from your raw data to build robust training pipelines.</p>
-          <span class="step-point" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">ETL pipelines</span>
-          <span class="step-point" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Feature engineering</span>
-          <span class="step-point" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Data validation</span>
+        </div>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#06b6d4" style="--node-glow:0 0 30px rgba(6,182,212,0.4),0 0 0 8px rgba(6,182,212,0.1);">🧠<div class="ptl-pulse" style="border-color:#06b6d4;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#06b6d4,rgba(6,182,212,0.7));">03</div>
+        </div>
+        <div class="ptl-col"></div>
+      </div>
+
+      <!-- Step 04 — RIGHT card -->
+      <div class="ptl-row" data-step="3">
+        <div class="ptl-col"></div>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#f59e0b" style="--node-glow:0 0 30px rgba(245,158,11,0.4),0 0 0 8px rgba(245,158,11,0.1);">📊<div class="ptl-pulse" style="border-color:#f59e0b;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#f59e0b,rgba(245,158,11,0.7));">04</div>
+        </div>
+        <div class="ptl-col">
+          <div class="ptl-anim from-right">
+            <div class="ptl-card" data-color="#f59e0b" data-border="rgba(245,158,11,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:18px;flex-shrink:0;"><i class="fas fa-chart-bar"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:1.5px;">Step 04</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Evaluation & Testing</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">Comprehensive model evaluation against business KPIs, bias detection, explainability analysis, and stress testing.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Performance metrics</span>
+                <span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">A/B testing</span>
+                <span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Bias detection</span>
+                <span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Explainability</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#06b6d4;">03</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:#06b6d4;"><i class="fas fa-brain"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#06b6d4;text-transform:uppercase;letter-spacing:1px;">Step 03</span>
+
+      <!-- Step 05 — LEFT card -->
+      <div class="ptl-row" data-step="4">
+        <div class="ptl-col">
+          <div class="ptl-anim from-left">
+            <div class="ptl-card" data-color="#10b981" data-border="rgba(16,185,129,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#10b981,rgba(16,185,129,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);display:flex;align-items:center;justify-content:center;color:#10b981;font-size:18px;flex-shrink:0;"><i class="fas fa-rocket"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:1.5px;">Step 05</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Deployment & Integration</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">Seamless deployment to your preferred cloud or on-premise infrastructure with full API integration and monitoring setup.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">CI/CD pipelines</span>
+                <span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">API development</span>
+                <span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">Cloud deployment</span>
+                <span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">Integration testing</span>
+              </div>
+            </div>
           </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Model Development</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">We research, design, and train cutting-edge ML/DL models with rigorous experimentation and hyperparameter optimization.</p>
-          <span class="step-point" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Algorithm selection</span>
-          <span class="step-point" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Model training</span>
-          <span class="step-point" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Cross-validation</span>
         </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#f59e0b;">04</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:#f59e0b;"><i class="fas fa-chart-bar"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;">Step 04</span>
-          </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Evaluation & Testing</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">Comprehensive model evaluation against business KPIs, bias detection, explainability analysis, and stress testing.</p>
-          <span class="step-point" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Performance metrics</span>
-          <span class="step-point" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">A/B testing</span>
-          <span class="step-point" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Bias detection</span>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#10b981" style="--node-glow:0 0 30px rgba(16,185,129,0.4),0 0 0 8px rgba(16,185,129,0.1);">🚀<div class="ptl-pulse" style="border-color:#10b981;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#10b981,rgba(16,185,129,0.7));">05</div>
         </div>
+        <div class="ptl-col"></div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#10b981;">05</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981;"><i class="fas fa-rocket"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:1px;">Step 05</span>
-          </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Deployment & Integration</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">Seamless deployment to your preferred cloud or on-premise infrastructure with full API integration and monitoring setup.</p>
-          <span class="step-point" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">CI/CD pipelines</span>
-          <span class="step-point" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">Cloud deployment</span>
-          <span class="step-point" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">API development</span>
+
+      <!-- Step 06 — RIGHT card -->
+      <div class="ptl-row" data-step="5">
+        <div class="ptl-col"></div>
+        <div class="ptl-node-col">
+          <div class="ptl-node" data-color="#ec4899" style="--node-glow:0 0 30px rgba(236,72,153,0.4),0 0 0 8px rgba(236,72,153,0.1);">📈<div class="ptl-pulse" style="border-color:#ec4899;display:none;"></div></div>
+          <div class="ptl-badge" style="opacity:0;background:linear-gradient(135deg,#ec4899,rgba(236,72,153,0.7));">06</div>
         </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="process-card">
-          <div class="step-num-bg" style="color:#ec4899;">06</div>
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div class="step-icon" style="background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);color:#ec4899;"><i class="fas fa-chart-line"></i></div>
-            <span style="font-size:11px;font-weight:800;color:#ec4899;text-transform:uppercase;letter-spacing:1px;">Step 06</span>
+        <div class="ptl-col">
+          <div class="ptl-anim from-right">
+            <div class="ptl-card" data-color="#ec4899" data-border="rgba(236,72,153,0.35)">
+              <div class="ptl-bar" style="background:linear-gradient(90deg,#ec4899,rgba(236,72,153,0.4));width:0%;"></div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:13px;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);display:flex;align-items:center;justify-content:center;color:#ec4899;font-size:18px;flex-shrink:0;"><i class="fas fa-chart-line"></i></div>
+                <span style="font-size:11px;font-weight:800;color:#ec4899;text-transform:uppercase;letter-spacing:1.5px;">Step 06</span>
+              </div>
+              <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Monitor & Optimize</h4>
+              <p style="font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:16px;">Continuous model monitoring, performance tracking, drift detection, and iterative improvements to maximize ROI.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Drift detection</span>
+                <span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Performance monitoring</span>
+                <span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Model retraining</span>
+                <span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">ROI reporting</span>
+              </div>
+            </div>
           </div>
-          <h4 style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:10px;">Monitor & Optimize</h4>
-          <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px;">Continuous model monitoring, performance tracking, drift detection, and iterative improvements to maximize ROI.</p>
-          <span class="step-point" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Drift detection</span>
-          <span class="step-point" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Model retraining</span>
-          <span class="step-point" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">ROI reporting</span>
         </div>
       </div>
     </div>
+    <!-- === END DESKTOP TIMELINE === -->
+
+    <!-- === MOBILE LINEAR === -->
+    <div class="process-mobile">
+      <!-- Step cards stacked vertically with left connector line -->
+      <style>
+        .ptl-tag { font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;display:inline-block; }
+      </style>
+      <div style="position:relative;padding-left:60px;">
+        <div style="position:absolute;left:24px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#0a84ff,#7c3aed,#06b6d4,#f59e0b,#10b981,#ec4899);border-radius:2px;"></div>
+        <!-- mobile step helper -->
+        <div class="pm-item from-below" data-step="0" style="position:relative;margin-bottom:28px;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(10,132,255,0.15);border:2px solid #0a84ff;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(10,132,255,0.3);">🔍</div>
+          <div class="ptl-card" data-color="#0a84ff" data-border="rgba(10,132,255,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#0a84ff,rgba(10,132,255,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#0a84ff;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 01 — Discovery & Requirements</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">We deep-dive into your business goals, data assets, and technical landscape to define the perfect AI strategy.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Business analysis</span><span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Data audit</span><span class="ptl-tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">Feasibility study</span></div>
+          </div>
+        </div>
+        <div class="pm-item from-below" data-step="1" style="position:relative;margin-bottom:28px;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(124,58,237,0.15);border:2px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(124,58,237,0.3);">🗄️</div>
+          <div class="ptl-card" data-color="#7c3aed" data-border="rgba(124,58,237,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#7c3aed,rgba(124,58,237,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 02 — Data Engineering</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Collect, clean, preprocess, and engineer features from your raw data to build robust training pipelines.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">ETL pipelines</span><span class="ptl-tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">Feature engineering</span></div>
+          </div>
+        </div>
+        <div class="pm-item from-below" data-step="2" style="position:relative;margin-bottom:28px;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(6,182,212,0.15);border:2px solid #06b6d4;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(6,182,212,0.3);">🧠</div>
+          <div class="ptl-card" data-color="#06b6d4" data-border="rgba(6,182,212,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#06b6d4,rgba(6,182,212,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#06b6d4;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 03 — Model Development</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Research, design, and train cutting-edge ML/DL models with rigorous experimentation and optimization.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Model training</span><span class="ptl-tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Cross-validation</span></div>
+          </div>
+        </div>
+        <div class="pm-item from-below" data-step="3" style="position:relative;margin-bottom:28px;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(245,158,11,0.15);border:2px solid #f59e0b;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(245,158,11,0.3);">📊</div>
+          <div class="ptl-card" data-color="#f59e0b" data-border="rgba(245,158,11,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#f59e0b,rgba(245,158,11,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#f59e0b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 04 — Evaluation & Testing</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Comprehensive model evaluation, bias detection, explainability analysis, and stress testing.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">A/B testing</span><span class="ptl-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Bias detection</span></div>
+          </div>
+        </div>
+        <div class="pm-item from-below" data-step="4" style="position:relative;margin-bottom:28px;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid #10b981;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(16,185,129,0.3);">🚀</div>
+          <div class="ptl-card" data-color="#10b981" data-border="rgba(16,185,129,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#10b981,rgba(16,185,129,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#10b981;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 05 — Deployment & Integration</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Seamless deployment to cloud or on-premise with full API integration and monitoring setup.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">CI/CD pipelines</span><span class="ptl-tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">Cloud deployment</span></div>
+          </div>
+        </div>
+        <div class="pm-item from-below" data-step="5" style="position:relative;">
+          <div style="position:absolute;left:-44px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(236,72,153,0.15);border:2px solid #ec4899;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 16px rgba(236,72,153,0.3);">📈</div>
+          <div class="ptl-card" data-color="#ec4899" data-border="rgba(236,72,153,0.35)">
+            <div class="ptl-bar" style="background:linear-gradient(90deg,#ec4899,rgba(236,72,153,0.4));width:100%;"></div>
+            <div style="font-size:11px;font-weight:800;color:#ec4899;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Step 06 — Monitor & Optimize</div>
+            <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Continuous monitoring, drift detection, and iterative improvements to maximize ROI.</p>
+            <div class="d-flex flex-wrap gap-2"><span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Drift detection</span><span class="ptl-tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">ROI reporting</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- === END MOBILE === -->
+
+    <!-- Global tag style (needs to be outside process-mobile for desktop too) -->
+    <style>
+      .ptl-tag { font-size:11px;font-weight:600;padding:3px 10px;border-radius:50px;display:inline-block; }
+    </style>
   </div>
 </section>
 
@@ -1199,127 +1724,79 @@
     <div class="row g-4" id="portfolioGrid">
       <div class="col-md-6 col-lg-4 port-item" data-cat="Computer Vision" data-aos="fade-up">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(10,132,255,0.1));">🏥
-            <div class="portfolio-metric" style="border:1px solid rgba(6,182,212,0.4);color:#06b6d4;">99.2% Accuracy</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(10,132,255,0.15),rgba(124,58,237,0.15));">🏥
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#10b981;">+40% accuracy</div>
           </div>
           <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#06b6d4;">Computer Vision</div>
-            <h4>Medical Image Diagnosis AI</h4>
-            <p>Deep learning model achieving 99.2% accuracy in detecting cancer from radiology scans, deployed in 15 hospitals.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">CNN</span><span class="tag" style="background:rgba(6,182,212,0.12);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">ResNet</span></div>
+            <div class="portfolio-cat" style="color:#0a84ff;">Computer Vision</div>
+            <h4>Medical Imaging AI Platform</h4>
+            <p>Deep learning system for radiological image analysis, reducing diagnosis time by 65% for Apollo Hospitals.</p>
           </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4 port-item" data-cat="NLP" data-aos="fade-up" data-aos-delay="60">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(236,72,153,0.08));">💬
-            <div class="portfolio-metric" style="border:1px solid rgba(124,58,237,0.4);color:#7c3aed;">10k+ daily queries</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(236,72,153,0.15));">🗣️
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#7c3aed;">12 languages</div>
           </div>
           <div class="portfolio-body">
             <div class="portfolio-cat" style="color:#7c3aed;">NLP</div>
-            <h4>Enterprise AI Assistant</h4>
-            <p>Company-wide conversational AI handling 10k+ queries/day across HR, IT, and customer support domains.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">GPT-4</span><span class="tag" style="background:rgba(124,58,237,0.12);color:#7c3aed;border:1px solid rgba(124,58,237,0.2);">RAG</span></div>
+            <h4>Multilingual Customer Support AI</h4>
+            <p>LLM-powered support system handling 50K+ queries/day in 12 languages, improving CSAT by 28%.</p>
           </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4 port-item" data-cat="Predictive Analytics" data-aos="fade-up" data-aos-delay="120">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.08));">📈
-            <div class="portfolio-metric" style="border:1px solid rgba(245,158,11,0.4);color:#f59e0b;">34% cost reduction</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(16,185,129,0.15));">📦
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#06b6d4;">$12M saved</div>
           </div>
           <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#f59e0b;">Predictive Analytics</div>
+            <div class="portfolio-cat" style="color:#06b6d4;">Predictive Analytics</div>
             <h4>Supply Chain Demand Forecasting</h4>
-            <p>Multi-variate time series model reducing inventory waste by 34% for a $2B retail chain across 500 locations.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">LSTM</span><span class="tag" style="background:rgba(245,158,11,0.12);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">Prophet</span></div>
+            <p>Time-series AI saving Reliance Retail $12M in inventory costs with 94% forecast accuracy.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 port-item" data-cat="Computer Vision" data-aos="fade-up">
+      <div class="col-md-6 col-lg-4 port-item" data-cat="Automation" data-aos="fade-up">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(6,182,212,0.08));">🚗
-            <div class="portfolio-metric" style="border:1px solid rgba(16,185,129,0.4);color:#10b981;">&lt;5ms latency</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.15));">🏭
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#f59e0b;">89% fewer defects</div>
           </div>
           <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#10b981;">Computer Vision</div>
-            <h4>Autonomous Vehicle Perception</h4>
-            <p>Real-time object detection and lane segmentation system processing 60fps video with &lt;5ms latency.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">YOLOv8</span><span class="tag" style="background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);">LiDAR</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 port-item" data-cat="Predictive Analytics" data-aos="fade-up" data-aos-delay="60">
-        <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(245,158,11,0.08));">🏦
-            <div class="portfolio-metric" style="border:1px solid rgba(239,68,68,0.4);color:#ef4444;">98.7% Precision</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
-          </div>
-          <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#ef4444;">Predictive Analytics</div>
-            <h4>Real-time Fraud Detection</h4>
-            <p>ML-powered transaction monitoring flagging fraudulent activity with 98.7% precision at 1M+ transactions/hour.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">XGBoost</span><span class="tag" style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">Kafka</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 port-item" data-cat="Automation" data-aos="fade-up" data-aos-delay="120">
-        <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(10,132,255,0.08));">🏭
-            <div class="portfolio-metric" style="border:1px solid rgba(99,102,241,0.4);color:#6366f1;">89% defect reduction</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
-          </div>
-          <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#6366f1;">Automation</div>
-            <h4>Smart Manufacturing QA</h4>
-            <p>Computer vision defect detection system reducing manufacturing defects by 89% with automated line stoppage.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(99,102,241,0.12);color:#6366f1;border:1px solid rgba(99,102,241,0.2);">Edge AI</span><span class="tag" style="background:rgba(99,102,241,0.12);color:#6366f1;border:1px solid rgba(99,102,241,0.2);">ONNX</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 port-item" data-cat="MLOps" data-aos="fade-up">
-        <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(20,184,166,0.15),rgba(16,185,129,0.08));">🌿
-            <div class="portfolio-metric" style="border:1px solid rgba(20,184,166,0.4);color:#14b8a6;">200+ data scientists</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
-          </div>
-          <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#14b8a6;">MLOps</div>
-            <h4>Unified ML Platform</h4>
-            <p>Internal MLOps platform serving 200+ data scientists with automated training, versioning, and A/B testing.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(20,184,166,0.12);color:#14b8a6;border:1px solid rgba(20,184,166,0.2);">MLflow</span><span class="tag" style="background:rgba(20,184,166,0.12);color:#14b8a6;border:1px solid rgba(20,184,166,0.2);">Kubeflow</span></div>
+            <div class="portfolio-cat" style="color:#f59e0b;">Automation</div>
+            <h4>Smart Manufacturing QA System</h4>
+            <p>Computer vision QA platform for Tata Motors, reducing defects by 89% and boosting throughput 40%.</p>
           </div>
         </div>
       </div>
       <div class="col-md-6 col-lg-4 port-item" data-cat="NLP" data-aos="fade-up" data-aos-delay="60">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(124,58,237,0.08));">😊
-            <div class="portfolio-metric" style="border:1px solid rgba(236,72,153,0.4);color:#ec4899;">12 languages</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(6,182,212,0.15));">💰
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#10b981;">76% fraud reduction</div>
           </div>
           <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#ec4899;">NLP</div>
-            <h4>Customer Sentiment Intelligence</h4>
-            <p>Multilingual sentiment analysis across social media, reviews, and support tickets in 12 languages.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">Transformers</span><span class="tag" style="background:rgba(236,72,153,0.12);color:#ec4899;border:1px solid rgba(236,72,153,0.2);">mBERT</span></div>
+            <div class="portfolio-cat" style="color:#10b981;">Fraud Detection</div>
+            <h4>Real-Time Fraud Prevention</h4>
+            <p>ML fraud detection processing 1M+ transactions/hour for HDFC Bank, reducing losses by 76%.</p>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4 port-item" data-cat="Automation" data-aos="fade-up" data-aos-delay="120">
+      <div class="col-md-6 col-lg-4 port-item" data-cat="MLOps" data-aos="fade-up" data-aos-delay="120">
         <div class="portfolio-card">
-          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(10,132,255,0.15),rgba(20,184,166,0.08));">⚡
-            <div class="portfolio-metric" style="border:1px solid rgba(10,132,255,0.4);color:#0a84ff;">97% accuracy</div>
-            <div class="portfolio-overlay"><button class="btn-primary-custom" style="padding:10px 20px;font-size:13px;border:none;" onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})"><i class="fas fa-eye"></i> View Case Study</button></div>
+          <div class="portfolio-img" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(124,58,237,0.15));">⚙️
+            <div class="portfolio-overlay"><a href="#contact" class="btn-primary-custom" style="padding:10px 22px;font-size:13px;">View Details</a></div>
+            <div class="portfolio-metric" style="color:#6366f1;">10x faster deploy</div>
           </div>
           <div class="portfolio-body">
-            <div class="portfolio-cat" style="color:#0a84ff;">Automation</div>
-            <h4>Intelligent Document Processing</h4>
-            <p>Automated extraction of structured data from 1M+ documents/month with 97% extraction accuracy.</p>
-            <div class="mt-2"><span class="tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">OCR</span><span class="tag" style="background:rgba(10,132,255,0.12);color:#0a84ff;border:1px solid rgba(10,132,255,0.2);">NLP</span></div>
+            <div class="portfolio-cat" style="color:#6366f1;">MLOps</div>
+            <h4>Enterprise MLOps Platform</h4>
+            <p>Full MLOps pipeline for Infosys AI Labs cutting deployment time from weeks to hours with 99.9% uptime.</p>
           </div>
         </div>
       </div>
@@ -1332,68 +1809,62 @@
   <div class="container">
     <div class="text-center mb-5" data-aos="fade-up">
       <div class="section-badge"><i class="fas fa-users"></i> Our Team</div>
-      <h2 class="section-title">Meet the <span class="gradient-text-cyan">AI Visionaries</span></h2>
-      <p class="section-subtitle mx-auto">World-class researchers, engineers, and strategists united by a passion for building transformative AI that matters.</p>
+      <h2 class="section-title">Meet the <span class="gradient-text-purple">AI Experts</span></h2>
+      <p class="section-subtitle mx-auto">A world-class team of researchers, engineers, and data scientists committed to building AI that actually works.</p>
     </div>
     <div class="row g-4">
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
         <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#0a84ff,#7c3aed);">NK<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#0a84ff,#7c3aed);z-index:-1;opacity:0.35;"></div></div>
-          <div class="team-name">Nikhil Kumar</div>
-          <div class="team-role">Founder & CEO</div>
-          <p class="team-bio">15+ years in AI research. Former ML lead at Google Brain with 50+ publications in top AI conferences.</p>
-          <div class="mb-3"><span class="team-skill">AI Strategy</span><span class="team-skill">ML Research</span><span class="team-skill">Leadership</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
+          <div class="team-avatar" style="background:linear-gradient(135deg,#0a84ff,#7c3aed);">AK<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#0a84ff,#7c3aed);z-index:-1;opacity:0.4;"></div></div>
+          <div class="team-name">Dr. Arjun Kumar</div>
+          <div class="team-role">CEO & Chief AI Officer</div>
+          <p class="team-bio">PhD from IIT Bombay. Ex-Google Brain. Published 40+ papers in NeurIPS, ICML.</p>
+          <div><span class="team-skill">Deep Learning</span><span class="team-skill">NLP</span><span class="team-skill">Research</span></div>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <a href="#" class="social-icon-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="80">
         <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#7c3aed,#ec4899);">PS<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);z-index:-1;opacity:0.35;"></div></div>
+          <div class="team-avatar" style="background:linear-gradient(135deg,#7c3aed,#ec4899);">PS<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);z-index:-1;opacity:0.4;"></div></div>
           <div class="team-name">Priya Sharma</div>
-          <div class="team-role">Chief AI Scientist</div>
-          <p class="team-bio">PhD in Deep Learning from MIT. Specializes in computer vision and generative models. 30+ peer-reviewed papers.</p>
-          <div class="mb-3"><span class="team-skill">Deep Learning</span><span class="team-skill">Computer Vision</span><span class="team-skill">GANs</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
+          <div class="team-role">CTO & Head of Engineering</div>
+          <p class="team-bio">15 years building scalable ML systems. Ex-Amazon, Microsoft. MLOps pioneer.</p>
+          <div><span class="team-skill">MLOps</span><span class="team-skill">Cloud AI</span><span class="team-skill">Systems</span></div>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <a href="#" class="social-icon-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="160">
         <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#06b6d4,#0a84ff);">RJ<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#0a84ff);z-index:-1;opacity:0.35;"></div></div>
-          <div class="team-name">Rahul Joshi</div>
-          <div class="team-role">Head of MLOps</div>
-          <p class="team-bio">Ex-Amazon engineer. Built ML infrastructure serving billions of predictions/day. Cloud-native architecture expert.</p>
-          <div class="mb-3"><span class="team-skill">MLOps</span><span class="team-skill">Kubernetes</span><span class="team-skill">AWS</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
+          <div class="team-avatar" style="background:linear-gradient(135deg,#06b6d4,#10b981);">RN<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#10b981);z-index:-1;opacity:0.4;"></div></div>
+          <div class="team-name">Rahul Nair</div>
+          <div class="team-role">Head of Computer Vision</div>
+          <p class="team-bio">Computer vision specialist. Built visual AI for top automotive and healthcare clients.</p>
+          <div><span class="team-skill">Computer Vision</span><span class="team-skill">YOLO</span><span class="team-skill">OpenCV</span></div>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <a href="#" class="social-icon-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="0">
+      <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="240">
         <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#10b981,#06b6d4);">AP<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#10b981,#06b6d4);z-index:-1;opacity:0.35;"></div></div>
-          <div class="team-name">Ananya Patel</div>
-          <div class="team-role">Lead NLP Engineer</div>
-          <p class="team-bio">Language model specialist with expertise in LLMs, RAG systems, and multilingual AI. Previously at OpenAI.</p>
-          <div class="mb-3"><span class="team-skill">LLMs</span><span class="team-skill">NLP</span><span class="team-skill">RAG</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">VR<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);z-index:-1;opacity:0.35;"></div></div>
-          <div class="team-name">Vikram Rao</div>
-          <div class="team-role">Computer Vision Lead</div>
-          <p class="team-bio">Real-time vision systems expert. Led development of autonomous vision for 3 self-driving vehicle programs.</p>
-          <div class="mb-3"><span class="team-skill">YOLO</span><span class="team-skill">TensorRT</span><span class="team-skill">Edge AI</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="team-card">
-          <div class="team-avatar" style="background:linear-gradient(135deg,#6366f1,#7c3aed);">SM<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#7c3aed);z-index:-1;opacity:0.35;"></div></div>
-          <div class="team-name">Sneha Mehta</div>
-          <div class="team-role">Data Engineering Lead</div>
-          <p class="team-bio">Big data and streaming pipeline architect. Designed data infrastructure processing 10TB+ daily at Fortune 500s.</p>
-          <div class="mb-3"><span class="team-skill">Spark</span><span class="team-skill">Kafka</span><span class="team-skill">Airflow</span></div>
-          <div><a href="#" class="social-icon-btn me-1"><i class="fab fa-linkedin-in"></i></a><a href="#" class="social-icon-btn me-1"><i class="fab fa-x-twitter"></i></a><a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a></div>
+          <div class="team-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">SM<div style="position:absolute;inset:-3px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);z-index:-1;opacity:0.4;"></div></div>
+          <div class="team-name">Sneha Menon</div>
+          <div class="team-role">Lead Data Scientist</div>
+          <p class="team-bio">Predictive analytics expert. Kaggle Grandmaster. Loves building models that stick in production.</p>
+          <div><span class="team-skill">ML</span><span class="team-skill">Analytics</span><span class="team-skill">Python</span></div>
+          <div class="d-flex justify-content-center gap-2 mt-3">
+            <a href="#" class="social-icon-btn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="social-icon-btn"><i class="fab fa-github"></i></a>
+          </div>
         </div>
       </div>
     </div>
@@ -1476,24 +1947,11 @@
         </div>
       </div>
     </div>
-    <!-- Proof bar -->
     <div class="proof-bar mt-5 d-flex flex-wrap justify-content-center gap-4" data-aos="fade-up" data-aos-delay="200">
-      <div class="proof-item">
-        <div class="proof-val"><i class="fas fa-star" style="color:#f59e0b;font-size:18px;"></i> 4.9/5</div>
-        <div class="proof-lbl">G2 Rating</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-val"><i class="fas fa-certificate" style="color:#f59e0b;font-size:18px;"></i> 5.0/5</div>
-        <div class="proof-lbl">Clutch Score</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-val"><i class="fas fa-check-circle" style="color:#10b981;font-size:18px;"></i> 4.8/5</div>
-        <div class="proof-lbl">Trustpilot</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-val"><i class="fas fa-thumbs-up" style="color:#0a84ff;font-size:18px;"></i> 72</div>
-        <div class="proof-lbl">Client NPS</div>
-      </div>
+      <div class="proof-item"><div class="proof-val"><i class="fas fa-star" style="color:#f59e0b;font-size:18px;"></i> 4.9/5</div><div class="proof-lbl">G2 Rating</div></div>
+      <div class="proof-item"><div class="proof-val"><i class="fas fa-certificate" style="color:#f59e0b;font-size:18px;"></i> 5.0/5</div><div class="proof-lbl">Clutch Score</div></div>
+      <div class="proof-item"><div class="proof-val"><i class="fas fa-check-circle" style="color:#10b981;font-size:18px;"></i> 4.8/5</div><div class="proof-lbl">Trustpilot</div></div>
+      <div class="proof-item"><div class="proof-val"><i class="fas fa-thumbs-up" style="color:#0a84ff;font-size:18px;"></i> 72</div><div class="proof-lbl">Client NPS</div></div>
     </div>
   </div>
 </section>
@@ -1596,7 +2054,6 @@
       <p class="section-subtitle mx-auto">Tell us about your project and we'll get back to you within 24 hours with a tailored proposal.</p>
     </div>
     <div class="row g-4">
-      <!-- Info -->
       <div class="col-lg-5" data-aos="fade-right">
         <div class="contact-card">
           <h3 style="font-weight:800;color:#fff;margin-bottom:8px;font-size:1.4rem;">Get In Touch</h3>
@@ -1628,16 +2085,13 @@
           </div>
         </div>
       </div>
-      <!-- Form -->
       <div class="col-lg-7" data-aos="fade-left">
         <div class="contact-card">
           <div id="successMsg" class="success-msg">
             <div style="font-size:4rem;margin-bottom:18px;filter:drop-shadow(0 0 20px rgba(16,185,129,0.4));">✅</div>
             <h3 style="font-weight:800;color:#fff;margin-bottom:10px;">Message Sent!</h3>
             <p style="color:var(--text-muted);font-size:15px;line-height:1.7;max-width:360px;">Thank you for reaching out! Our team will review your project details and get back to you within 24 hours.</p>
-            <button class="btn-primary-custom mt-4" onclick="resetForm()" style="border:none;">
-              <i class="fas fa-redo"></i> Send Another
-            </button>
+            <button class="btn-primary-custom mt-4" onclick="resetForm()" style="border:none;"><i class="fas fa-redo"></i> Send Another</button>
           </div>
           <form id="contactFormBody" onsubmit="handleSubmit(event)">
             <div class="row g-3">
@@ -1766,7 +2220,6 @@
   </div>
 </footer>
 
-<!-- Back to top -->
 <button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
 
 <!-- Bootstrap JS -->
@@ -1776,170 +2229,462 @@
 
 <script>
   /* ======================================
-     INIT AOS
+     LIVE BLOOMBERG TICKER
   ====================================== */
+  const TICKER_DATA = [
+    { label:'ACCURACY',        value:99.4,  suffix:'%',   dec:1, color:'#10b981', arrow:'▲' },
+    { label:'PROJECTS',        value:500,   suffix:'+',   dec:0, color:'#0a84ff', arrow:'▲' },
+    { label:'CLIENT NPS',      value:72,    suffix:'',    dec:0, color:'#06b6d4', arrow:'▲' },
+    { label:'AVG ROI',         value:340,   suffix:'%',   dec:0, color:'#10b981', arrow:'▲' },
+    { label:'FRAUD REDUCTION', value:76,    suffix:'%',   dec:0, color:'#0a84ff', arrow:'▲' },
+    { label:'UPTIME SLA',      value:99.9,  suffix:'%',   dec:1, color:'#10b981', arrow:'▲' },
+    { label:'COMPANIES',       value:150,   suffix:'+',   dec:0, color:'#06b6d4', arrow:'▲' },
+    { label:'SATISFACTION',    value:99,    suffix:'%',   dec:0, color:'#10b981', arrow:'▲' },
+    { label:'DATA PTS/DAY',    value:10,    suffix:'M+',  dec:0, color:'#7c3aed', arrow:'▲' },
+    { label:'INFERENCE',       value:40,    suffix:'ms',  dec:0, color:'#f59e0b', arrow:'▼' },
+    { label:'DEFECT DROP',     value:89,    suffix:'%',   dec:0, color:'#10b981', arrow:'▲' },
+    { label:'COST SAVED',      value:12,    suffix:'M$+', dec:0, color:'#06b6d4', arrow:'▲' },
+  ];
+
+  let tickerValues = TICKER_DATA.map(t => t.value);
+
+  function buildTickerHTML() {
+    const all = [...TICKER_DATA, ...TICKER_DATA]; // duplicate for seamless loop
+    return all.map((t, i) => {
+      const val = tickerValues[i % TICKER_DATA.length];
+      const base = TICKER_DATA[i % TICKER_DATA.length].value;
+      const isUp = val >= base;
+      const displayColor = t.arrow === '▼'
+        ? (val <= base ? '#10b981' : '#ef4444')
+        : (isUp ? t.color : '#ef4444');
+      const displayed = t.dec > 0 ? val.toFixed(t.dec) : Math.floor(val);
+      return `<span class="ticker-item">
+        <span class="ticker-item-label">${t.label}</span>
+        <span class="ticker-item-arrow" style="color:${displayColor}">${t.arrow}</span>
+        <span class="ticker-item-value" style="color:${displayColor}">${displayed}${t.suffix}</span>
+        <span class="ticker-sep">·</span>
+      </span>`;
+    }).join('');
+  }
+
+  const tickerTrack = document.getElementById('tickerTrack');
+  if (tickerTrack) {
+    tickerTrack.innerHTML = buildTickerHTML();
+
+    setInterval(() => {
+      tickerValues = tickerValues.map((v, i) => {
+        const base = TICKER_DATA[i].value;
+        const dec  = TICKER_DATA[i].dec;
+        const jitter = (Math.random() - 0.5) * (dec === 0 ? 2 : 0.2);
+        return parseFloat(Math.max(base * 0.97, v + jitter).toFixed(dec));
+      });
+      tickerTrack.innerHTML = buildTickerHTML();
+    }, 1800);
+  }
+
+  /* ======================================  AOS  */
   AOS.init({ duration: 700, once: true, easing: 'ease-out-cubic', offset: 60 });
 
-  /* ======================================
-     NAVBAR SCROLL
-  ====================================== */
+  /* ======================================  NAVBAR  */
   window.addEventListener('scroll', () => {
     const nav = document.getElementById('mainNav');
     const btn = document.getElementById('backTop');
-    if (window.scrollY > 60) nav.classList.add('scrolled');
-    else nav.classList.remove('scrolled');
-    if (window.scrollY > 400) btn.classList.add('show');
-    else btn.classList.remove('show');
+    if (window.scrollY > 60) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+    if (window.scrollY > 400) btn.classList.add('show'); else btn.classList.remove('show');
+    updateProcessLine();
   });
 
-  /* ======================================
-     MOBILE MENU TOGGLE
-  ====================================== */
+  /* ======================================  MOBILE MENU  */
   document.getElementById('navToggle').addEventListener('click', () => {
     const menu = document.getElementById('mobileMenu');
     const icon = document.getElementById('navIcon');
     menu.classList.toggle('open');
     icon.className = menu.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
   });
-
-  /* ======================================
-     SMOOTH SCROLL
-  ====================================== */
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth' });
-        // Close mobile menu
-        document.getElementById('mobileMenu').classList.remove('open');
-        document.getElementById('navIcon').className = 'fas fa-bars';
-      }
+  document.querySelectorAll('.nav-link-c').forEach(l => {
+    l.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('navIcon').className = 'fas fa-bars';
     });
   });
 
-  /* ======================================
-     TYPING EFFECT
-  ====================================== */
-  const words = ['Artificial Intelligence', 'Machine Learning', 'Deep Learning', 'Data Science', 'Computer Vision'];
-  let wi = 0, ci = 0, deleting = false;
-  const el = document.getElementById('typedWord');
-  function type() {
-    const word = words[wi];
-    el.textContent = deleting ? word.slice(0, ci--) : word.slice(0, ci++);
-    if (!deleting && ci > word.length) { deleting = true; setTimeout(type, 2000); return; }
-    if (deleting && ci < 0) { deleting = false; wi = (wi + 1) % words.length; ci = 0; }
-    setTimeout(type, deleting ? 60 : 90);
-  }
-  type();
-
-  /* ======================================
-     PARTICLES CANVAS
-  ====================================== */
-  (function() {
-    const canvas = document.getElementById('particles-canvas');
-    const ctx = canvas.getContext('2d');
-    function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-    resize(); window.addEventListener('resize', resize);
-    const pts = Array.from({length:60}, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 0.5,
-      a: Math.random() * 0.5 + 0.2
-    }));
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      pts.forEach(p => {
-        p.x = (p.x + p.vx + canvas.width) % canvas.width;
-        p.y = (p.y + p.vy + canvas.height) % canvas.height;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(10,132,255,${p.a})`; ctx.fill();
+  /* ======================================  COUNTER  */
+  let counted = false;
+  const animateCounter = (el, target, suffix) => {
+    let start = 0;
+    const duration = 2000;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start) + suffix;
+      if (start >= target) clearInterval(timer);
+    }, 16);
+  };
+  const checkCounters = () => {
+    if (counted) return;
+    const el = document.getElementById('stats');
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85) {
+      counted = true;
+      document.querySelectorAll('[data-target]').forEach(el => {
+        animateCounter(el, parseInt(el.dataset.target), el.dataset.suffix || '');
       });
-      for (let i=0; i<pts.length; i++) for (let j=i+1; j<pts.length; j++) {
-        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
-        if (d<120) { ctx.beginPath(); ctx.strokeStyle=`rgba(10,132,255,${0.12*(1-d/120)})`; ctx.lineWidth=0.5; ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke(); }
-      }
-      requestAnimationFrame(draw);
     }
-    draw();
+  };
+  window.addEventListener('scroll', checkCounters, { passive: true });
+  checkCounters();
+
+  /* ======================================  TYPING EFFECT  */
+  const words = ['Artificial Intelligence', 'Machine Learning', 'Deep Learning', 'Computer Vision', 'NLP Solutions', 'Predictive Analytics'];
+  let wi = 0, ci = 0, del = false;
+  const typed = document.getElementById('typedWord');
+  setInterval(() => {
+    const w = words[wi];
+    if (!del) {
+      typed.textContent = w.slice(0, ++ci);
+      if (ci >= w.length) { del = true; setTimeout(() => {}, 1500); }
+    } else {
+      typed.textContent = w.slice(0, --ci);
+      if (ci === 0) { del = false; wi = (wi + 1) % words.length; }
+    }
+  }, del ? 60 : 90);
+
+  /* ======================================  PARTICLES  */
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 60; i++) particles.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1.8 + 0.3, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, opacity: Math.random() * 0.5 + 0.1 });
+  (function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(10,132,255,${p.opacity})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(loop);
   })();
 
-  /* ======================================
-     COUNTER ANIMATION
-  ====================================== */
-  function animateCounters() {
-    document.querySelectorAll('[data-target]').forEach(el => {
-      const target = +el.dataset.target, suffix = el.dataset.suffix || '';
-      let start = null;
-      function step(ts) {
-        if (!start) start = ts;
-        const p = Math.min((ts - start) / 2200, 1);
-        const eased = 1 - Math.pow(1-p, 3);
-        el.textContent = Math.floor(eased * target) + suffix;
-        if (p < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    });
-  }
-  const statsObs = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) { animateCounters(); statsObs.disconnect(); }
-  }, { threshold: 0.3 });
-  statsObs.observe(document.getElementById('stats'));
-
-  /* ======================================
-     PORTFOLIO FILTER
-  ====================================== */
+  /* ======================================  PORTFOLIO FILTER  */
   document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const filter = btn.dataset.filter;
       document.querySelectorAll('.port-item').forEach(item => {
-        if (filter === 'all' || item.dataset.cat === filter) {
-          item.classList.remove('hidden');
-        } else {
-          item.classList.add('hidden');
-        }
+        item.classList.toggle('hidden', filter !== 'all' && item.dataset.cat !== filter);
       });
     });
   });
 
-  /* ======================================
-     BUDGET BUTTONS
-  ====================================== */
-  function selectBudget(btn) {
+  /* ======================================  CONTACT FORM  */
+  function selectBudget(el) {
     document.querySelectorAll('.budget-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    el.classList.add('active');
   }
-
-  /* ======================================
-     CONTACT FORM SUBMIT
-  ====================================== */
   function handleSubmit(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
     const txt = document.getElementById('submitTxt');
-    btn.disabled = true;
-    btn.querySelector('i').className = 'fas fa-spinner fa-spin';
+    btn.style.opacity = '0.7';
     txt.textContent = 'Sending...';
     setTimeout(() => {
       document.getElementById('contactFormBody').classList.add('hidden');
       document.getElementById('successMsg').classList.add('show');
     }, 1500);
   }
-
   function resetForm() {
     document.getElementById('contactFormBody').classList.remove('hidden');
     document.getElementById('successMsg').classList.remove('show');
-    document.getElementById('contactFormBody').reset();
-    document.querySelectorAll('.budget-btn').forEach(b => b.classList.remove('active'));
     const btn = document.getElementById('submitBtn');
-    btn.disabled = false;
-    btn.querySelector('i').className = 'fas fa-paper-plane';
     document.getElementById('submitTxt').textContent = 'Send Project Brief';
+    btn.style.opacity = '1';
   }
+
+  /* ======================================
+     PROCESS TIMELINE ANIMATIONS
+  ====================================== */
+  const processSection = document.getElementById('process');
+  const ptlFill = document.getElementById('ptlFill');
+  const ptlRows = document.querySelectorAll('.ptl-row');
+  const pmItems = document.querySelectorAll('.pm-item');
+  const revealedSteps = new Set();
+
+  /* Scroll-driven fill line */
+  function updateProcessLine() {
+    if (!processSection || !ptlFill) return;
+    const rect = processSection.getBoundingClientRect();
+    const windowH = window.innerHeight;
+    const progress = Math.min(Math.max((-rect.top / (rect.height - windowH)) * 100, 0), 100);
+    ptlFill.style.height = progress + '%';
+  }
+
+  /* IntersectionObserver for step rows (desktop) */
+  if (ptlRows.length) {
+    const rowObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const row = entry.target;
+        const stepIdx = parseInt(row.dataset.step);
+        if (revealedSteps.has(stepIdx)) return;
+        revealedSteps.add(stepIdx);
+
+        setTimeout(() => {
+          /* Animate card */
+          const anim = row.querySelector('.ptl-anim');
+          if (anim) anim.classList.add('revealed');
+
+          /* Animate node */
+          const node = row.querySelector('.ptl-node');
+          const pulse = row.querySelector('.ptl-pulse');
+          const badge = row.querySelector('.ptl-badge');
+          const bar = row.querySelector('.ptl-bar');
+          const color = node ? node.dataset.color : null;
+
+          if (node && color) {
+            node.style.borderColor = color;
+            node.style.background = color + '22';
+            node.style.transition = 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+            node.style.filter = 'drop-shadow(0 0 12px ' + color + '80)';
+            node.style.transform = 'scale(1)';
+          }
+          if (pulse) { pulse.style.display = 'block'; }
+          if (badge) {
+            badge.style.opacity = '1';
+            badge.style.transform = 'translateY(0) scale(1)';
+          }
+          if (bar) { bar.style.width = '100%'; }
+
+          /* Card border highlight */
+          const card = row.querySelector('.ptl-card');
+          if (card) {
+            card.style.borderColor = card.dataset.border || 'rgba(10,132,255,0.35)';
+            card.onmouseenter = () => {
+              card.style.borderColor = card.dataset.color;
+              card.style.transform = 'translateY(-6px)';
+              card.style.boxShadow = '0 20px 50px rgba(0,0,0,0.4), 0 0 30px ' + card.dataset.color + '25';
+            };
+            card.onmouseleave = () => {
+              card.style.borderColor = card.dataset.border;
+              card.style.transform = 'translateY(0)';
+              card.style.boxShadow = 'none';
+            };
+          }
+        }, stepIdx * 80);
+      });
+    }, { threshold: 0.2 });
+
+    ptlRows.forEach(row => {
+      const node = row.querySelector('.ptl-node');
+      if (node) node.style.transform = 'scale(0.5)';
+      rowObs.observe(row);
+    });
+  }
+
+  /* IntersectionObserver for mobile items */
+  if (pmItems.length) {
+    const mobileObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const item = entry.target;
+        const stepIdx = parseInt(item.dataset.step);
+        setTimeout(() => { item.classList.add('revealed'); }, stepIdx * 80);
+      });
+    }, { threshold: 0.2 });
+    pmItems.forEach(item => mobileObs.observe(item));
+  }
+
+  /* Initial call */
+  updateProcessLine();
+
+  /* ======================================  SMOOTH SCROLL  */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+</script>
+
+<!-- ======================================================
+     ARIA CHATBOT WIDGET
+====================================================== -->
+<div id="chatWindow" class="hidden">
+  <div class="chat-header">
+    <div class="chat-avatar">🤖</div>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px;color:#fff;font-family:'Space Grotesk',sans-serif">ARIA</div>
+      <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:5px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;box-shadow:0 0 6px #10b981"></span>
+        N-Infotech AI Assistant
+      </div>
+    </div>
+    <div style="font-size:11px;color:#94a3b8;text-align:right;flex-shrink:0">
+      <div style="color:#10b981;font-weight:700">Online</div>
+      <div>~instant reply</div>
+    </div>
+    <button id="chatClose" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px;margin-left:6px;padding:0;line-height:1;transition:color 0.2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">×</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-quick-replies" id="chatQuickReplies"></div>
+  <div class="chat-input-row">
+    <input id="chatInput" type="text" placeholder="Ask about pricing, services, timelines…" autocomplete="off"/>
+    <button id="chatSend"><i class="fas fa-paper-plane" style="font-size:14px"></i></button>
+  </div>
+  <div class="chat-powered">Powered by N-Infotech Conversational AI</div>
+</div>
+
+<div id="chatFab">
+  <div class="chat-pulse-ring"></div>
+  <div class="chat-pulse-ring-2"></div>
+  <button class="chat-fab-btn" id="chatFabBtn">
+    <i class="fas fa-comment-dots"></i>
+    <div class="chat-badge" id="chatBadge">1</div>
+  </button>
+  <div class="chat-tooltip">Ask ARIA anything ✨</div>
+</div>
+
+<script>
+(function() {
+  const RESPONSES = [
+    { p:/service|offer|do you do|what can/i,         r:"We offer 9 core AI/ML services:\n\n• Machine Learning Development\n• Deep Learning & Neural Networks\n• Natural Language Processing\n• Computer Vision\n• Predictive Analytics\n• Robotic Process Automation\n• MLOps & Cloud AI\n• Conversational AI\n• AI Security & Fraud Detection\n\nWhich area interests you most?" },
+    { p:/price|cost|pricing|how much|budget|starter|professional|enterprise/i, r:"Our pricing starts at <strong>$2,999</strong> for the Starter plan (1 ML model, up to 100K records).\n\nOur most popular Professional plan is <strong>$9,999</strong> (up to 5 models, 5M records, real-time monitoring).\n\nEnterprise is <strong>custom pricing</strong> for unlimited scale.\n\nAll plans include NDA + IP ownership transfer + 30-day money-back. Want a free consultation?" },
+    { p:/how long|timeline|duration|time|week|month/i, r:"Project timelines depend on complexity:\n\n• Starter MVP — <strong>4–8 weeks</strong>\n• Mid-scale production model — <strong>2–4 months</strong>\n• Full enterprise AI transformation — <strong>4–12 months</strong>\n\nWe follow a 6-step process: Discovery → Data → Model Dev → Evaluation → Deployment → Monitoring." },
+    { p:/secur|data|privacy|gdpr|compliance|nda|confidential/i, r:"Security is our top priority:\n\n🔒 NDA signed before any data sharing\n🔒 SOC 2 Type II compliant infrastructure\n🔒 GDPR & HIPAA capable pipelines\n🔒 End-to-end encryption at rest & in transit\n🔒 IP ownership fully transferred to client\n🔒 Option for on-premise deployment" },
+    { p:/health|hospital|medical|clinic|pharma|radiol/i, r:"Healthcare is one of our strongest verticals:\n\n🏥 Medical imaging AI (radiology, pathology)\n🧬 Drug discovery accelerators\n📋 Clinical NLP for notes & EHR\n🔬 Genomics data analysis\n\nOur work with Apollo Hospitals improved diagnostic accuracy by 40%. We're HIPAA-compliant." },
+    { p:/nlp|natural language|text|chatbot|language|sentiment/i, r:"Our NLP capabilities include:\n\n💬 Custom LLM fine-tuning (GPT-4, LLaMA, Mistral)\n🌍 Multilingual support (50+ languages)\n📄 Document intelligence & extraction\n😊 Sentiment & intent analysis\n🤖 Production chatbots & virtual agents\n📧 Email/ticket classification" },
+    { p:/computer vision|image|video|object detect|cv|yolo|ocr/i, r:"Our Computer Vision team specialises in:\n\n👁 Object detection & tracking (YOLO, Detectron2)\n🏭 Industrial quality inspection (89% defect reduction)\n🏥 Medical imaging analysis\n📝 OCR & document digitisation\n🎥 Real-time video analytics at 60fps" },
+    { p:/mlops|deploy|cloud|aws|azure|gcp|pipeline|monitor/i, r:"Our MLOps & Cloud AI services:\n\n☁️ Cloud deployment (AWS SageMaker, Azure ML, GCP)\n🔄 CI/CD pipelines for ML models\n📊 Real-time model monitoring & drift detection\n⚡ Auto-retraining on data drift\n📦 Docker + Kubernetes orchestration\n\nWe cut deployment time from weeks to hours." },
+    { p:/team|engineer|expert|phd|experience/i, r:"Our team of 50+ AI experts includes:\n\n👨‍🔬 Dr. Arjun Kumar — CEO, IIT Bombay PhD, ex-Google Brain\n👩‍💻 Priya Sharma — CTO, ex-Amazon & Microsoft\n👁 Rahul Nair — Head of Computer Vision\n📊 Sneha Menon — Lead Data Scientist, Kaggle Grandmaster\n\n10+ years, 500+ projects, 20 industries." },
+    { p:/contact|talk|call|demo|consult|meet|schedule/i, r:"I'd love to connect you with our team!\n\n📅 <strong>Free 1-hour consultation</strong> — no commitment\n📧 hello@n-infotech.ai\n📞 +91 98765 43210\n🕐 Mon–Fri, 9 AM – 7 PM IST\n\nScroll down to our Contact form and we'll respond within 24 hours with a tailored proposal." },
+    { p:/fraud|bank|finance|fintech|transaction|anomaly/i, r:"We've built fraud detection for major banks:\n\n💳 Real-time transaction scoring (<5ms latency)\n📈 1M+ transactions/hour throughput\n🎯 76% fraud loss reduction (HDFC Bank)\n🔍 Behavioral anomaly detection\n📊 Explainable AI for compliance teams" },
+    { p:/roi|return|benefit|result|outcome|impact/i, r:"Our average client ROI in Year 1:\n\n📈 <strong>340% average ROI</strong> across all projects\n💰 $12M inventory savings (Reliance Retail)\n🚫 76% fraud reduction (HDFC Bank)\n⚡ 10x faster model deployment (Infosys)\n🏭 89% fewer manufacturing defects (Tata)" },
+  ];
+  const FALLBACK = "That's a great question! Our team would be best placed to answer that in depth.\n\nI'd recommend a <strong>free 1-hour consultation</strong> — reach us at hello@n-infotech.ai or scroll down to the contact form. Anything else I can clarify?";
+  const QUICK = ["What services do you offer?","How much does ML development cost?","How long does a project take?","Can you handle our data securely?","Do you work with healthcare clients?"];
+
+  let open = false, unread = 1, msgCount = 0, hasOpened = false;
+  const win   = document.getElementById('chatWindow');
+  const msgs  = document.getElementById('chatMessages');
+  const qr    = document.getElementById('chatQuickReplies');
+  const input = document.getElementById('chatInput');
+  const badge = document.getElementById('chatBadge');
+  const fabBtn= document.getElementById('chatFabBtn');
+  const rings = document.querySelectorAll('.chat-pulse-ring,.chat-pulse-ring-2');
+
+  function fmtTime(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+
+  function markdownToHTML(t){
+    return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }
+
+  function addMsg(from, text) {
+    msgCount++;
+    const d = document.createElement('div');
+    if (from === 'bot') {
+      d.className = 'chat-msg-bot';
+      d.innerHTML = `<div class="chat-bot-mini">🤖</div><div class="chat-bubble-bot">${markdownToHTML(text)}</div>`;
+    } else {
+      d.className = 'chat-msg-user';
+      d.innerHTML = `<div class="chat-bubble-user">${text}</div>`;
+    }
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+    // hide quick replies after 3 messages
+    if (msgCount >= 4) qr.style.display = 'none';
+  }
+
+  function showTyping() {
+    const d = document.createElement('div');
+    d.className = 'chat-msg-bot'; d.id = 'chatTyping';
+    d.innerHTML = `<div class="chat-bot-mini">🤖</div><div class="chat-bubble-bot" style="padding:12px 16px"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+    msgs.appendChild(d);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('chatTyping');
+    if (t) t.remove();
+  }
+
+  function matchReply(text) {
+    for (const r of RESPONSES) if (r.p.test(text)) return r.r;
+    return FALLBACK;
+  }
+
+  function sendMsg(text) {
+    if (!text.trim()) return;
+    input.value = '';
+    addMsg('user', text);
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMsg('bot', matchReply(text));
+    }, 900 + Math.random() * 600);
+  }
+
+  function buildQuickReplies() {
+    qr.innerHTML = '';
+    QUICK.forEach(q => {
+      const btn = document.createElement('button');
+      btn.className = 'chat-chip';
+      btn.textContent = q;
+      btn.onclick = () => sendMsg(q);
+      qr.appendChild(btn);
+    });
+  }
+
+  function toggleChat() {
+    open = !open;
+    if (open) {
+      win.classList.remove('hidden');
+      win.style.animation = 'none';
+      void win.offsetWidth;
+      win.style.animation = 'chatSlideIn 0.3s cubic-bezier(0.16,1,0.3,1) both';
+      unread = 0;
+      badge.style.display = 'none';
+      rings.forEach(r => r.style.display = 'none');
+      fabBtn.classList.add('open');
+      fabBtn.innerHTML = '<i class="fas fa-times"></i>';
+      hasOpened = true;
+      setTimeout(() => input.focus(), 300);
+    } else {
+      win.classList.add('hidden');
+      fabBtn.classList.remove('open');
+      fabBtn.innerHTML = `<i class="fas fa-comment-dots"></i>`;
+      if (!hasOpened) {
+        badge.style.display = 'flex';
+        badge.textContent = unread;
+        rings.forEach(r => r.style.display = 'block');
+      }
+    }
+  }
+
+  // Initial greeting
+  addMsg('bot', "Hi! I'm <strong>ARIA</strong>, N-Infotech's AI assistant 👋\n\nI can tell you about our services, pricing, timelines, or technology. What would you like to know?");
+  buildQuickReplies();
+
+  // Proactive message after 8s
+  setTimeout(() => {
+    if (!hasOpened) {
+      addMsg('bot', "👋 Curious about AI pricing or timelines? Ask me anything — I'm here to help!");
+      unread++;
+      badge.textContent = unread;
+    }
+  }, 8000);
+
+  fabBtn.addEventListener('click', toggleChat);
+  document.getElementById('chatClose').addEventListener('click', toggleChat);
+  document.getElementById('chatSend').addEventListener('click', () => sendMsg(input.value));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(input.value); });
+})();
 </script>
 </body>
 </html>
