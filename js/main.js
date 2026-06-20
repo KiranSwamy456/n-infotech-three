@@ -109,16 +109,34 @@
   const words = ['Artificial Intelligence', 'Machine Learning', 'Deep Learning', 'Computer Vision', 'NLP Solutions', 'Predictive Analytics'];
   let wi = 0, ci = 0, del = false;
   const typed = document.getElementById('typedWord');
-  setInterval(() => {
+
+  function typeTick() {
     const w = words[wi];
+    let delay;
+
     if (!del) {
       typed.textContent = w.slice(0, ++ci);
-      if (ci >= w.length) { del = true; setTimeout(() => {}, 1500); }
+      if (ci >= w.length) {
+        del = true;
+        delay = 1800;
+      } else {
+        delay = 120;
+      }
     } else {
       typed.textContent = w.slice(0, --ci);
-      if (ci === 0) { del = false; wi = (wi + 1) % words.length; }
+      if (ci === 0) {
+        del = false;
+        wi = (wi + 1) % words.length;
+        delay = 350;
+      } else {
+        delay = 75;
+      }
     }
-  }, del ? 60 : 90);
+
+    setTimeout(typeTick, delay);
+  }
+
+  typeTick();
 
   /* ======================================  PARTICLES  */
   const canvas = document.getElementById('particles-canvas');
